@@ -1,70 +1,58 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import {Text,View,Button, Pressable} from 'react-native';
-import { ExampleComp } from './ExampleComp';
-import { RefreshControl, ScrollView, TextInput } from 'react-native-web';
+import {Text,View ,Button, Pressable, TextInput, Alert, Image} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AntDesign } from '@expo/vector-icons';
+
 
 export default function HomeScreen() {
 
-  const [cep, setCep] = useState("");
-  const [logradouro, setLogradouro] = useState("");
-  const [complemento, setComplemento] = useState("");
-  const [bairro, setbairro] = useState("");
-  const [localidade, setLocalidade] = useState("");
-  const [uf, setUF] = useState("");
+  const navigation = useNavigation();
 
-  useEffect(()=>{
-
-    console.log(cep.replace("-","").length);
-    if (cep.replace("-","").length == 8){
-
-      //com await para deixar síncrono (criando uma funcao assíncrona)
-      const call = async () => {
-        let url = "https://viacep.com.br/ws/"+cep.replace("-","")+"/json/";
-        let json = await fetch(url).then(data => {
-          return data.json();
-        });
-
-        console.log(json);
-        setLogradouro(json.logradouro);
-        setComplemento(json.complemento);
-        setbairro(json.bairro);
-        setLocalidade(json.localidade);
-        setUF(json.uf);
-      }
-      call()
-
-
-      /** ou sem await assíncrono */
-
-      /*let url = "https://viacep.com.br/ws/"+cep.replace("-","")+"/json/";
-      let json = fetch(url).then(data => {
-        return data.json();
-      }).then(json => {
-        console.log(json);
-        setLogradouro(json.logradouro);
-        setComplemento(json.complemento);
-        setbairro(json.bairro);
-        setLocalidade(json.localidade);
-        setUF(json.uf);
-      });*/
-
+  function testeSalvar(){
+    var func = async () => {
+        try {
+            await AsyncStorage.setItem("nome", "João");
+        } catch (error) {
+            console.log(error);
+        }
     }
+    func();
+  }
 
-  }, [cep]);
- 
+  function testeRecuperar(){
+    var func = async () => {
+        try {
+            let nomeSalvo = await AsyncStorage.getItem("nome");
+            Alert.alert('Nome que está salvo',nomeSalvo?.toString());
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    func();
+  }
+
+  function testeCamera(){
+    navigation.navigate('Camera');
+  }
+
   return (
     <View>
-      <Text>Estou no lugar certo?</Text>
+      <Text>Home!!!</Text>
 
-        <TextInput value={cep}
-                     onChangeText={setCep} />
+      <AntDesign name="meh" size={24} color="black" />
 
-        <Text>{logradouro}</Text>
-        <Text>{complemento}</Text>
-        <Text>{bairro}</Text>
-        <Text>{localidade}</Text>
-        <Text>{uf}</Text>
+      <Image style={{width: 100, height: 100}}
+          source={{uri:
+            'https://facebook.github.io/react-native/img/tiny_logo.png'}}
+       />
+
+      <Button onPress={testeSalvar} title="Teste salvar"/>
+
+      <Button onPress={testeRecuperar} title="Teste recuperar"/>
+
+      <Button onPress={testeCamera} title="Camera"/>
+
     </View>
   );
 }
